@@ -12,10 +12,11 @@ from main.forms import *
 from django.db import IntegrityError
 from django.utils import simplejson
 from django.views.decorators.csrf import csrf_exempt
-
+from django.core import serializers
+import json
 @csrf_exempt
 #@csrf_protect
-#@login_required
+@login_required
 def question(request):
 	if request.POST:
 		no = int(request.POST['no'])
@@ -27,23 +28,30 @@ def question(request):
 	except ObjectDoesNotExist:
 		raise Http404
 	try:
-		q=Question.objects.get(no=no)
+		ques=Question.objects.filter(no=no)
+		q=ques
 	except:
 		raise Http404
-	# for i in q:
-	# 	if up.qu.filter(pk=i.id).exists():
-	# 		q=''
-	# 		break
-	# 	if up.waf.filter(pk=i.id).exists():
-	# 		if i.id<=25:
-	# 			q=Question.objects.get(id=i.id+25)
-	# 		elif i.id>25:
-	# 			q=''
+	for i in ques:
+		cv=i.no
+		cid=Cordinates.objects.get(value=cv)
+	 	if up.qu.filter(cordinates_id=cid.id).exists():
+	 		q=''
+	 		break
+	 	elif up.waf.filter(cordinates_id=cid.id).exists():
+	 		if up.was.filter(cordinates_id=cid.id).exists():
+	 			q=''
+	 			break
+	 		else:
+	 			q=Question.objects.get(id=i.id+25)
+	 	else:
+	 		q=i
+
 	if request.POST and 'answer' in request.POST:
 		data=request.POST
 		if data['answer']==q.answer:
-			# up.qa.add(q)
-			# up.ca.add(q)
+			c=Cordinates.objects.get(value=q.no)
+			up.qu.add(c)
 			up.save()
 			resp={}
 			resp['status']=1
@@ -52,8 +60,10 @@ def question(request):
 			json = simplejson.dumps(resp)
 			return HttpResponse(json, mimetype='application/json')
 		elif data['answer'] is not q.answer :
+		 	if up.waf.filter(cordinates_id=c.id).exists():
+	 			if up.was.filter(cordinates_id=c.id).exists():
 			up.wa.add(q)
-			up.score-=5
+			up.score-=2
 			resp={}
 			resp['status']=0
 			resp['score']=up.score
@@ -95,11 +105,18 @@ def question(request):
 def main(request):
 	u=request.user
 	up=UserProfile.objects.get(user=u)
-	unlocked=up.qu.all()
-	wrong_attempt_first=up.waf.all()
-	wrong_attempt_second=up.was.all()
-	wordlist=up.words.all()
-	return render_to_response('index.html', {'wordlist':wordlist,'u':u,'up':up,'unlocked':unlocked,'wrong_attempt_first':wrong_attempt_first,'wrong_attempt_second':wrong_attempt_second,},context_instance=RequestContext(request))
+	return render_to_response('index.html', {'u':u,'up':up,},context_instance=RequestContext(request))
+@login_required
+def initialize(request):
+	u=request.user
+	up=UserProfile.objects.get(user=u)
+	resp={}
+	resp['unlocked']=serializers.serialize("json",up.qu.all())
+	resp['waf']=serializers.serialize("json",up.waf.all())
+	resp['was']=serializers.serialize("json",up.was.all())
+	resp['words']=serializers.serialize("json",up.words.all())
+	json=simplejson.dumps(resp)
+	return HttpResponse(json, mimetype='application/json')
 @csrf_protect
 def login(request):
 	if request.user.is_authenticated():
