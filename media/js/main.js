@@ -164,3 +164,23 @@ $('#answerSubmit').click(function() {
 		}
 	});	
 });
+
+var dat;
+
+$(document).ready(function() {
+	$.ajax({
+		url : '/initialize/',
+		dataType : 'json',
+		success : function(data) {
+			var tmp = data.unlocked;
+			tmp = JSON.parse(tmp);
+			for(var i=0;i<tmp.length;i++) {
+				var id = tmp[i].pk - 1;
+				var row = id/5;
+				var col = id%5;
+				unlock[row][col] = 5;
+				setMatrix();
+			}
+		} 
+	});
+});
