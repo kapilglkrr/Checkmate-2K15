@@ -206,9 +206,9 @@ table, tr, td{
 
 	<div id="topBar" class="topBar">
 		<div id="head" class="head">check<span style="font-weight:100;">mate</span></div>
-		<div id="topContainer1" class="topContainer1">132</div>
+		<div id="topContainer1" class="topContainer1">{{up.score}}</div>
 		<div id="topContainer2" class="topContainer2">
-			<div id="userName" class="userName" ><span class="ln">Team : </span><br><span class="fn">DVM</span><br></div>
+			<div id="userName" class="userName" ><span class="ln">Team : </span><br><span class="fn">{{u.username}}</span><br></div>
 		</div>
 	</div>
 
@@ -258,11 +258,11 @@ table, tr, td{
 <script>
 var iprev=-1,jprev=-1,matrix=[],unlock=[],madeword='';
 unlock=[
-			[1,0,0,1,0],
-			[0,0,1,0,1],
-			[0,1,0,1,0],
 			[0,0,0,0,0],
-			[1,0,0,1,0]
+			[0,0,0,0,0],
+			[0,0,0,0,0],
+			[0,0,0,0,0],
+			[0,0,0,0,0]
 		];
 matrix=[
 	[11,12,13,14,15],
@@ -299,20 +299,24 @@ matrix_data=[
 	$('#game_container').html(str);
 }
 
-// setting temporary values of box with js	
-for(var i = 0; i < 5; i++)
-{
-	for(var j = 0; j < 5; j++)
+// setting temporary values of box
+
+function setMatrix() {
+	for(var i = 0; i < 5; i++)
 	{
-		ele = $('.alphabet[data-place=\"' + matrix[i][j] + '\"]');
-		ele.html(matrix_data[i][j]);
-		//changing property of the unlocked question
-		if(unlock[i][j]==1)
+		for(var j = 0; j < 5; j++)
 		{
-			ele.parents('.alphabet_cont').addClass('unlocked_css');
+			ele = $('.alphabet[data-place=\"' + matrix[i][j] + '\"]');
+			ele.html(matrix_data[i][j]);
+			//changing property of the unlocked question
+			if(unlock[i][j]==5)
+			{
+				ele.parents('.alphabet_cont').addClass('unlocked_css');
+			}
 		}
-	}
-};
+	};
+}
+
 function open_lb(x){
 	$('#blackout_ques').fadeIn();
 	$('#questions_lb').fadeIn();
@@ -401,6 +405,7 @@ $("#submit_ans div").click(function(){
 					}
 			}); 
 });
+
 $(".alphabet_cont").click(function(){
 	var place = $(this).find('.alphabet').data('place');
 	$("#submit_ans div").data('place',place);

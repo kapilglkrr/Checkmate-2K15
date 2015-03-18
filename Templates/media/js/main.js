@@ -164,3 +164,13 @@ $('#answerSubmit').click(function() {
 		}
 	});	
 });
+
+$(window).onLoad(function() {
+	$.ajax({
+		url : '/initialize/',
+		dataType : 'json',
+		success : function(data) {
+			console.log(data);
+		} 
+	});
+});
