@@ -1,0 +1,461 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>ACM | Checkmate</title>
+	<link rel="stylesheet" href="./media/css/main.css"	 />
+	<link rel="stylesheet" href="./media/css/importFonts.css" />
+	<script src="./media/js/jquery.min.js"></script>
+<!-- start ########################################################## -->
+<style>
+#game_pos_div{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+	height: 560px;
+}
+#game_container{
+	width: 100%;
+}
+.alphabet_cont{
+	position: relative;
+	width: 100px;
+	height: 95px;
+	line-height: 95px;
+	text-align: center;
+	margin: 3px;
+	background: rgb(231,20,1);
+	-webkit-user-select: none;  
+	-moz-user-select: none;    
+	-ms-user-select: none;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+.alphabet_cont:hover{
+	background: rgb(115,100,33);
+}
+.alphabet{
+	position: absolute;
+	width: 70px;
+	height: 70px;
+	line-height: 70px;
+	font-size: 2em;
+	text-align: center;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	margin: auto;
+}
+.points{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	text-align: center;
+	font-size: 15px;
+}
+#blackout_ques{
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	z-index: 1000;
+	background-color: rgba(0,0,0,0.3);
+}
+#questions_lb{
+	display: none;
+	position: absolute;
+	width: 700px;
+	height: 500px;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	background: #eee;
+	z-index: 2000;
+}
+#lb_ques_content{
+	position: absolute;
+	top: 20px;
+	left: 0;
+	right: 0;
+	margin: auto;
+	width: 600px;
+	height: 350px;
+	background-color: #aaa;
+}
+#submit_ans{
+	position: absolute;
+	bottom: 20px;
+	left: 0;
+	right: 0;
+	margin: auto;
+	width: 600px;	
+	height: 100px;
+}
+#submit_ans input{
+	position: relative;
+	float:right;
+	margin: 0;
+	padding: 0px 0px 0px 20px;
+	width: 580px;
+	height: 50px;
+	line-height: 50px;
+	font-size: 2em;
+	border: 0;
+	background: #bbb;
+}
+#submit_ans div{
+	position: absolute;
+	right: 0;
+	background: #a9e339;
+	color: black;
+	font-size: 1.5em;
+	font-weight: 500;
+	width: 100px;
+	text-align: center;
+	height: 50px;
+	line-height: 50px;
+}
+#words{
+	position: relative;
+	float:right;
+	top: 5px;
+	padding-left: 20px;
+	width: 480px;
+	height: 50px;
+	line-height: 50px;
+	font-size: 2em;
+	background: #bbb;
+}
+table, tr, td{
+    border-collapse: collapse;
+    padding: 0;
+    margin: auto;
+}
+#clear_word{
+	position: absolute;
+	top: 5px;
+	left: 0px;
+	background: #2b333b;
+	color: white;
+	width: 25px;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+}
+#claim_word{
+	position: absolute;
+	right: 0;
+	top: 5px;
+	background: #a9e339;
+	color: black;
+	font-size: 1.5em;
+	font-weight: 500;
+	width: 100px;
+	text-align: center;
+	height: 50px;
+	line-height: 50px;
+}
+#word_container{
+	position: relative;
+	margin: auto;
+	width: 525px;
+	height: 55px;
+}
+.unlocked_css{
+	background: green;
+}
+/*market*/
+#market_buy{
+	top: 80px;
+}
+#open_market{
+	position: relative;
+	height: 25px;
+	line-height: 25px;
+	text-align: center;
+	background-color: #a9e339;
+	border-bottom: 5px solid #8bcc0e;
+}
+#buy_this{
+	position: relative;
+	width: 100%;
+}
+
+</style>
+<!-- end ################################################################################ -->
+</head>
+<body>
+	<div id="blackout" class="blackout">
+		<div id="closeBox" class="closeBox">CLOSE</div>
+		<div id="blackoutContent" class="blackoutContent">
+			<div id="blackoutContentWrapper" class="blackoutContentWrapper"></div>
+		</div>
+	</div>
+
+	<div id="topBar" class="topBar">
+		<div id="head" class="head">check<span style="font-weight:100;">mate</span></div>
+		<div id="topContainer1" class="topContainer1">132</div>
+		<div id="topContainer2" class="topContainer2">
+			<div id="userName" class="userName" ><span class="ln">Team : </span><br><span class="fn">DVM</span><br></div>
+		</div>
+	</div>
+
+	<!-- market -->
+	<div id="market_buy" class="rightBox">
+		<div id="open_market"  onclick="buy_this()">
+			Buy this
+		</div>
+		<input type="text" name="buy_this" id="buy_this" />
+	</div>
+	<!--   -->
+
+	<div id="shop" class="rightBox shop" >
+		<div id="shopHeader" class="header shopHeader">
+			<img class="rightIcon" src="./media/img/c2.png">
+			Sucessful Words
+		</div>
+	</div>
+
+<!-- start 0f grid############################################################################# -->
+	<div id="IOWrapper" class="IOWrapper">
+		<div id="game_pos_div">
+			<div id="game_container"></div>
+			<div id="word_container">
+				<div id="clear_word" onclick="clear_word()"> < </div>
+				<div id="words"></div>
+				<div id="claim_word" onclick="claim_word()">Claim</div>
+			</div>
+		</div>
+	</div>
+		<!-- light box -->
+		<div id="blackout_ques" onclick="close_lb()">		
+		</div>
+		<div id="questions_lb">
+					<div id="lb_ques_content"></div>
+					<div id="submit_ans">
+						<input type="text" />
+						<div>Submit</div>
+					</div>
+					<!-- <div onclick="unlock_let()" class="unlock_letter" data-unlock="">Submit</div> -->
+		</div>
+<!-- end of grid################################################################################ -->
+
+<script src="./media/js/main.js"></script>
+
+<!-- start of script############################################################################# -->
+<script>
+var iprev=-1,jprev=-1,matrix=[],unlock=[],madeword='';
+unlock=[
+			[1,0,0,1,0],
+			[0,0,1,0,1],
+			[0,1,0,1,0],
+			[0,0,0,0,0],
+			[1,0,0,1,0]
+		];
+matrix=[
+	[11,12,13,14,15],
+	[21,22,23,24,25],
+	[31,32,33,34,35],
+	[41,42,43,44,45],
+	[51,52,53,54,55]
+];//naming system used for individual box
+matrix_data=[
+	['F','A','T','S','D'],
+	['U','A','I','V','O'],
+	['C','T','K','P','O'],
+	['Z','N','E','E','G'],
+	['R','J','W','L','N']
+];
+{
+	var str,ele;
+	str = '<table>';
+	for (var i = 0; i < 5; i++) {
+		str += '<tr>';
+		for (var j = 0; j < 5; j++) {
+			str += '\n<td><div class=\"alphabet_cont\"><div class=\"points\">2</div><div class=\"alphabet\" data-place=\"' + matrix[i][j] + '\""></div></div></td>';
+			// $.ajax({
+			// url: '#',
+			// dataType:'json',
+			// success: function(data){
+			// 	  $('.alphabet [data-place="' + matrix[i][j] + '"]').html(data);
+			// 	}
+			// });
+		}
+		str += '</tr>';
+	};
+	str += '</table>';
+	$('#game_container').html(str);
+}
+
+// setting temporary values of box with js	
+for(var i = 0; i < 5; i++)
+{
+	for(var j = 0; j < 5; j++)
+	{
+		ele = $('.alphabet[data-place=\"' + matrix[i][j] + '\"]');
+		ele.html(matrix_data[i][j]);
+		//changing property of the unlocked question
+		if(unlock[i][j]==1)
+		{
+			ele.parents('.alphabet_cont').addClass('unlocked_css');
+		}
+	}
+};
+function open_lb(x){
+	$('#blackout_ques').fadeIn();
+	$('#questions_lb').fadeIn();
+	$('.unlock_letter').data('unlock',x);
+	$('#lb_ques_content').html(x);
+}
+function close_lb(){
+	$('#blackout_ques').fadeOut();
+	$('#questions_lb').fadeOut();
+}
+function clear_word(){
+	$('#words').html('');
+	$('.alphabet_cont').css({'background':'','border':''});
+	madeword = '';
+	iprev=-1;
+	jprev=-1;
+}
+function claim_word(){
+	if(madeword != '')
+	{
+		alert("You claimed the word "+madeword);
+	}
+	else
+		alert("please make a word");
+	clear_word();
+}
+
+//start of functions of market#################################
+function buy_this(){
+	ele=$('[name=buy_this');
+	var place = ele.val();
+	var i = parseInt(place/10)-1;
+	var j = place%10 - 1;
+	ele.val('');
+	if(unlock[i][j]!=1)
+	change_css_unlock(i,j);
+	else
+		console.log("already unlocked");
+}
+//End of functions of market#####################
+//start of all functions dealing with unlock process of the letter###########################################
+function unlock_let(){
+	alert('unlocked');
+	var place = $('.unlock_letter').data('unlock');
+	var i = parseInt(place/10)-1;
+	var j = place%10 - 1;
+	if(unlock[i][j] < 2)
+	{
+		change_css_unlock(i,j);
+	}
+}
+
+//remove this function after developing**************************************
+function unlockall()
+{
+	for(var i=0;i<5;i++)
+	{
+		for(var j=0;j<5;j++)
+		{
+			change_css_unlock(i,j);
+		}
+	}
+}
+//***************************************
+function change_css_unlock(i,j)
+{
+	unlock[i][j]++;
+	ele = $('.alphabet[data-place=\"' + matrix[i][j] + '\"]');
+	ele.parents('.alphabet_cont').addClass('unlocked_css');
+}
+//end of unlock functions########################################
+
+// single and double clicks#############################################################
+$("#submit_ans div").click(function(){
+	var ans=$("#submit_ans input").val();
+	var place=$("#submit_ans div").data('place');
+	console.log(ans +"  "+ place);
+	$.ajax({
+				url: '/question/',
+				type: "POST",
+				data: $.param({ answer : ans, no: place}),
+				dataType:'json',
+				success: function(data){
+					  console.log("sucess");
+					  console.log(data);
+					}
+			}); 
+});
+$(".alphabet_cont").click(function(){
+	var place = $(this).find('.alphabet').data('place');
+	$("#submit_ans div").data('place',place);
+	var i = parseInt(place/10)-1;
+	var j = place%10 - 1;
+    if(unlock[i][j]!=1 && unlock[i][j]!=2) {
+            open_lb(place);  //perform single-click action   
+            $.ajax({
+				url: '/question/',
+				type: "POST",
+				data: $.param({ no : place}),
+				dataType:'json',
+				success: function(data){
+					  console.log("sucess");
+					  console.log(data);
+					  $('#lb_ques_content').html(data['content']);
+					  
+					}
+			}); 
+    }
+    else if(unlock[i][j]==1 || unlock[i][j]==2)
+    {
+        var place,i,j, obj_letter;
+		var i = parseInt(place/10)-1;
+		var j = place%10 - 1;
+		if(unlock[i][j]!=0)
+		{
+			var flag = -1<=(i-iprev) && (i-iprev)<=1 && -1<=(j-jprev) && (j-jprev)<=1 && $(this).css('background-color')!='rgb(204, 204, 204)'  || iprev==-1
+			if(flag)
+			{
+				obj_letter = $('.alphabet[data-place=\"' + matrix[i][j] + '\"]').html()
+				$('#words').append(obj_letter);
+				madeword += obj_letter;
+				$('.alphabet_cont').css({'border':''});
+				$(this).css({'background':'#ccc','border':'2px solid #2b333b'});	
+				iprev=i;
+				jprev=j;
+			}
+			else
+			{
+				console.log('wrong selection');
+			}
+		}
+		else
+		{
+			alert("Unlock first! from light box");
+		}
+		clicks = 0;             //after action performed, reset counter
+    }
+});
+$(".alphabet").on("dblclick", function(e){
+	e.preventDefault();  //cancel system double-click event
+});
+//end of single and double click#######################################
+</script>
+<!-- end of script############################################################################# -->
+</body>
+</html>
