@@ -29,28 +29,22 @@ def question(request):
 		raise Http404
 	try:
 		ques=Question.objects.filter(no=no)
-		q=ques
 	except:
 		raise Http404
 	for i in ques:
 		cv=i.no
 		cid=Cordinates.objects.get(value=cv)
-	 	if up.qu.filter(cordinates_id=cid.id).exists():
-	 		q=''
-	 		break
-	 	elif up.waf.filter(cordinates_id=cid.id).exists():
-	 		if up.was.filter(cordinates_id=cid.id).exists():
-	 			q=''
-	 			break
-	 		else:
-	 			q=Question.objects.get(id=i.id+25)
+	 	if up.waf.filter(value=i.no).exists():
+ 			q=Question.objects.get(id=i.id+25)
+ 			break
 	 	else:
 	 		q=i
+	 		break
 
 	if request.POST and 'answer' in request.POST:
 		data=request.POST
+		c=Cordinates.objects.get(value=q.no)
 		if data['answer']==q.answer:
-			c=Cordinates.objects.get(value=q.no)
 			up.qu.add(c)
 			up.save()
 			resp={}
@@ -60,10 +54,12 @@ def question(request):
 			json = simplejson.dumps(resp)
 			return HttpResponse(json, mimetype='application/json')
 		elif data['answer'] is not q.answer :
+		 	if not up.waf.filter(cordinates_id=c.id).exists():
+		 		up.waf.add(c)
 		 	if up.waf.filter(cordinates_id=c.id).exists():
-	 			if up.was.filter(cordinates_id=c.id).exists():
-			up.wa.add(q)
+		 		up.was.add(c)
 			up.score-=2
+			up.save()
 			resp={}
 			resp['status']=0
 			resp['score']=up.score
@@ -75,13 +71,12 @@ def question(request):
 		word=request.POST
 		w=Words.objects.get(word=word['word'])
 		if w:
-			up.words += word
+			up.words.add(w)
 			up.score=w.points
 			u.save()
 			resp={}
 			resp['status']=1
 			resp['score']=up.score
-			resp['qno']=q.no
 			json = simplejson.dumps(resp)
 			return HttpResponse(json, mimetype='application/json')
 		
