@@ -17,9 +17,9 @@ class UserProfile(models.Model):
 	email1=models.EmailField()
 	email2=models.EmailField(blank=True,null=True)
 	password=models.CharField(max_length=50)
-	qu=models.ManyToManyField('Question',related_name='qu')#storing list of questions unlocked
-	waf=models.ManyToManyField('Question',related_name='waf') #storing list of wrong attempted question on first attempt
-	was=models.ManyToManyField('Question',related_name='was') #storing list of wrong attempted question on second attempt
+	qu=models.ManyToManyField('Cordinates',related_name='qu')#storing list of coordinates unlocked
+	waf=models.ManyToManyField('Cordinates',related_name='waf') #storing list of wrong attempted coordinates on first attempt
+	was=models.ManyToManyField('Cordinates',related_name='was') #storing list of wrong attempted coordinates on second attempt
 	words=models.ManyToManyField('Words',related_name='words') #storing list of words made
 	def __unicode__(self):
 		return self.user.username
@@ -27,3 +27,6 @@ class UserProfile(models.Model):
 class Words(models.Model):
 	word=models.CharField(max_length=15)
 	points=models.IntegerField()
+
+class Cordinates(models.Model):
+	value=models.IntegerField()
