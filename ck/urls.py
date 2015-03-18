@@ -19,6 +19,7 @@ urlpatterns = patterns('',
 #    url(r'^market/$',market,name='market'),
     url(r'^logout/$',logout,name='logout'),
     url(r'^register/$',register,name='register'),
+    url(r'^initialize/$', initialize,name='initialize')
 )
 from settings import MEDIA_URL, MEDIA_ROOT, DEBUG
 if DEBUG:
