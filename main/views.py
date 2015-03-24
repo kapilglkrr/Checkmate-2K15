@@ -46,11 +46,12 @@ def question(request):
 		c=Cordinates.objects.get(value=q.no)
 		if data['answer']==q.answer:
 			up.qu.add(c)
+#			a2=up.waf.remove(c)
 			up.save()
 			resp={}
 			resp['status']=1
 			resp['score']=up.score
-			resp['qno']=q.no
+			resp['qno']=q.no	
 			json = simplejson.dumps(resp)
 			return HttpResponse(json, mimetype='application/json')
 		elif data['answer'] is not q.answer :
@@ -67,26 +68,6 @@ def question(request):
 			json = simplejson.dumps(resp)
 			return HttpResponse(json, mimetype='application/json')
 
-	if request.POST and 'word' in request.POST:
-		word=request.POST
-		w=Words.objects.get(word=word['word'])
-		if w:
-			up.words.add(w)
-			up.score=w.points
-			u.save()
-			resp={}
-			resp['status']=1
-			resp['score']=up.score
-			json = simplejson.dumps(resp)
-			return HttpResponse(json, mimetype='application/json')
-		
-		else:
-			resp={}
-			resp['status']=0
-			resp['score']=up.score
-			resp['qno']=q.no
-			json = simplejson.dumps(resp)
-			return HttpResponse(json, mimetype='application/json')	
 	# elif request.POST:
 	# 	raise Http404
 	else :
@@ -95,6 +76,54 @@ def question(request):
 		resp['content']=q.content
 		json = simplejson.dumps(resp)
 		return HttpResponse(json, mimetype='application/json')
+@csrf_exempt
+@login_required
+def claimword(request):
+	u=request.user
+	up=UserProfile.objects.get(user=u)
+	resp={}
+	if request.POST:
+		word=request.POST
+		w=Words.objects.get(word=word['word'])
+		if w:
+			up.words.add(w)
+			up.score +=w.points
+			up.save()
+			resp['status']=1
+			resp['score']=up.score
+			resp['word']=word['word']
+			json = simplejson.dumps(resp)
+			return HttpResponse(json, mimetype='application/json')
+		
+		else:
+			resp['status']=0
+			resp['score']=up.score
+			json = simplejson.dumps(resp)
+			return HttpResponse(json, mimetype='application/json')
+	else:
+		json = simplejson.dumps(resp)
+		return HttpResponse(json, mimetype='application/json')	
+
+@csrf_exempt
+@login_required
+def buy(request):
+	u=request.user
+	up=UserProfile.objects.get(user=u)
+	resp={}
+	if request.POST:
+		co=request.POST
+		c=Cordinates.objects.get(id=co['cords'])
+		up.qu.add(c)
+		up.score -= 2
+		resp['status']=1
+		resp['place']=co['cords']
+		resp['score']=up.score
+		json = simplejson.dumps(resp)
+		return HttpResponse(json, mimetype='application/json')
+	else:
+		json = simplejson.dumps(resp)
+		return HttpResponse(json, mimetype='application/json')
+
 
 @login_required
 def main(request):
@@ -110,6 +139,7 @@ def initialize(request):
 	resp['waf']=serializers.serialize("json",up.waf.all())
 	resp['was']=serializers.serialize("json",up.was.all())
 	resp['words']=serializers.serialize("json",up.words.all())
+	resp['score']=up.score
 	json=simplejson.dumps(resp)
 	return HttpResponse(json, mimetype='application/json')
 @csrf_protect
