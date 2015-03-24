@@ -168,19 +168,58 @@ $('#answerSubmit').click(function() {
 var dat;
 
 $(document).ready(function() {
+	init();
+});
+
+function init() {
 	$.ajax({
 		url : '/initialize/',
 		dataType : 'json',
 		success : function(data) {
+
 			var tmp = data.unlocked;
 			tmp = JSON.parse(tmp);
 			for(var i=0;i<tmp.length;i++) {
 				var id = tmp[i].pk - 1;
-				var row = id/5;
+				var row = parseInt(id/5);
 				var col = id%5;
 				unlock[row][col] = 5;
-				setMatrix();
 			}
+
+			tmp = data.waf;
+			tmp = JSON.parse(tmp);
+
+			for(var i=0;i<tmp.length;i++) {
+				var id = tmp[i].pk - 1;
+				var row = parseInt(id/5);
+				var col = id%5;
+				console.log(row);
+				console.log(col);
+				unlock[row][col] = 1;
+			}
+
+			tmp = data.was;
+			tmp = JSON.parse(tmp);
+			for(var i=0;i<tmp.length;i++) {
+				var id = tmp[i].pk - 1;
+				var row = parseInt(id/5);
+				var col = id%5;
+				unlock[row][col] = 2;
+			}
+
+			setMatrix();
+
+			tmp = data.words;
+			tmp = JSON.parse(tmp);
+
+			var dat = "";
+			for(var i =0;i<tmp.length;i++) {
+				var word = tmp[i].fields.word;
+				dat += word+"<br>";
+			}
+			$("#shopData").html(dat);
+
+			updateScore(data.score);
 		} 
 	});
-});
+}

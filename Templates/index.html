@@ -28,7 +28,7 @@
 	line-height: 95px;
 	text-align: center;
 	margin: 3px;
-	background: rgb(231,20,1);
+	background: #EB2C2C;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
 	-ms-user-select: none;
@@ -36,7 +36,7 @@
 	-moz-box-sizing: border-box;
 }
 .alphabet_cont:hover{
-	background: rgb(115,100,33);
+	
 }
 .alphabet{
 	position: absolute;
@@ -174,23 +174,41 @@ table, tr, td{
 	height: 55px;
 }
 .unlocked_css{
-	background: green;
+	background: #2A59D1;
+}
+.waf_css{
+	background: #F3D916;
+}
+.was_css{
+	background: #6DD40D;
 }
 /*market*/
 #market_buy{
 	top: 80px;
+	height: 100px;
 }
 #open_market{
-	position: relative;
-	height: 25px;
-	line-height: 25px;
-	text-align: center;
 	background-color: #a9e339;
 	border-bottom: 5px solid #8bcc0e;
 }
 #buy_this{
+	width: 100px;
+	height: 25px;
+	line-height: 25px;
+	font-size: 20px;
 	position: relative;
-	width: 100%;
+	margin: 10px;
+	left: 50px;
+	float: left;
+}
+
+#buynow {
+	position: relative;
+	float: right;
+	padding: 5px;
+	margin: 10px;
+	right: 50px;
+	border: 1px solid #aaa;
 }
 
 </style>
@@ -214,18 +232,21 @@ table, tr, td{
 
 	<!-- market -->
 	<div id="market_buy" class="rightBox">
-		<div id="open_market"  onclick="buy_this()">
-			Buy this
+		<div id="open_market" class="header shopHeader" >
+			<img class="rightIcon" src="./media/img/c2.png">
+			MarketPlace
 		</div>
 		<input type="text" name="buy_this" id="buy_this" />
+		<div onclick="buy_this()" id="buynow">Buy Now !</div>
 	</div>
 	<!--   -->
 
 	<div id="shop" class="rightBox shop" >
 		<div id="shopHeader" class="header shopHeader">
-			<img class="rightIcon" src="./media/img/c2.png">
+			<img class="rightIcon" src="./media/img/q1.png">
 			Sucessful Words
 		</div>
+		<div id="shopData"></div>
 	</div>
 
 <!-- start 0f grid############################################################################# -->
@@ -284,7 +305,7 @@ matrix_data=[
 	for (var i = 0; i < 5; i++) {
 		str += '<tr>';
 		for (var j = 0; j < 5; j++) {
-			str += '\n<td><div class=\"alphabet_cont\"><div class=\"points\">2</div><div class=\"alphabet\" data-place=\"' + matrix[i][j] + '\""></div></div></td>';
+			str += '\n<td><div class=\"alphabet_cont\"><div class=\"points\">'+((i*5)+j+1)+'</div><div class=\"alphabet\" data-place=\"' + matrix[i][j] + '\""></div></div></td>';
 			// $.ajax({
 			// url: '#',
 			// dataType:'json',
@@ -313,6 +334,14 @@ function setMatrix() {
 			{
 				ele.parents('.alphabet_cont').addClass('unlocked_css');
 			}
+			else if(unlock[i][j]==1)
+			{
+				ele.parents('.alphabet_cont').addClass('waf_css');
+			}
+			else if(unlock[i][j]==2)
+			{
+				ele.parents('.alphabet_cont').addClass('was_css');
+			}
 		}
 	};
 }
@@ -335,9 +364,24 @@ function clear_word(){
 	jprev=-1;
 }
 function claim_word(){
-	if(madeword != '')
-	{
-		alert("You claimed the word "+madeword);
+	if(madeword != '') {
+		$.ajax({
+			url : '/claimword/',
+			method : 'POST', 
+			data : { word : madeword },
+			success : function(data) {
+				if(data.status == 1) {
+					updateScore(data.score);
+					$("#shopData").append(data.word+"<br>");
+				}
+				else if(data.status == 2) {
+					alert("This word has already been claimed !");
+				}
+				else if(data.status == 0) {
+					alert("This is not a valid word !");
+				}
+			}
+		});
 	}
 	else
 		alert("please make a word");
@@ -347,14 +391,28 @@ function claim_word(){
 //start of functions of market#################################
 function buy_this(){
 	ele=$('[name=buy_this');
-	var place = ele.val();
-	var i = parseInt(place/10)-1;
-	var j = place%10 - 1;
-	ele.val('');
-	if(unlock[i][j]!=1)
-	change_css_unlock(i,j);
-	else
-		console.log("already unlocked");
+	var place = parseInt(ele.val()) - 1;
+	var i = parseInt(place/5);
+	var j = parseInt(place%5);
+	if(unlock[i][j]!=5) {
+		$.ajax({
+			url : '/buy/',
+			method : "POST",
+			data : { cords : (place+1)}, 
+			success : function(data) {
+				if(data.status == 1) {
+					updateScore(data.score);
+					change_css_unlock(parseInt((data.place-1)/5),parseInt((data.place-1)%5));
+				}
+				else {
+					alert("You could not buy this Letter !");
+				}
+			}
+		});
+	}
+	else {
+		alert("This letter is already unlocked !");
+	}
 }
 //End of functions of market#####################
 //start of all functions dealing with unlock process of the letter###########################################
@@ -393,16 +451,22 @@ function change_css_unlock(i,j)
 $("#submit_ans div").click(function(){
 	var ans=$("#submit_ans input").val();
 	var place=$("#submit_ans div").data('place');
-	console.log(ans +"  "+ place);
+	//console.log(ans +"  "+ place);
 	$.ajax({
 				url: '/question/',
 				type: "POST",
 				data: $.param({ answer : ans, no: place}),
 				dataType:'json',
 				success: function(data){
-					  console.log("sucess");
-					  console.log(data);
+					 if(data.status == 1) {
+					 	init();
 					}
+					else {
+						alert("Incorrect Answer ! Please try again..");
+						init();
+					}
+					close_lb();
+				}
 			}); 
 });
 
@@ -411,7 +475,7 @@ $(".alphabet_cont").click(function(){
 	$("#submit_ans div").data('place',place);
 	var i = parseInt(place/10)-1;
 	var j = place%10 - 1;
-    if(unlock[i][j]!=1 && unlock[i][j]!=2) {
+    if(unlock[i][j]==1 || unlock[i][j]==0) {
             open_lb(place);  //perform single-click action   
             $.ajax({
 				url: '/question/',
@@ -419,14 +483,14 @@ $(".alphabet_cont").click(function(){
 				data: $.param({ no : place}),
 				dataType:'json',
 				success: function(data){
-					  console.log("sucess");
-					  console.log(data);
+					  //console.log("sucess");
+					  //console.log(data);
 					  $('#lb_ques_content').html(data['content']);
 					  
 					}
 			}); 
     }
-    else if(unlock[i][j]==1 || unlock[i][j]==2)
+    else if(unlock[i][j]==5)
     {
         var place,i,j, obj_letter;
 		var i = parseInt(place/10)-1;
@@ -446,7 +510,7 @@ $(".alphabet_cont").click(function(){
 			}
 			else
 			{
-				console.log('wrong selection');
+				//console.log('wrong selection');
 			}
 		}
 		else
