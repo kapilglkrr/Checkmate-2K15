@@ -22,6 +22,7 @@ urlpatterns = patterns('',
     url(r'^initialize/$', initialize,name='initialize'),
     url(r'^claimword/$',claimword,name='claimword'),
     url(r'^buy/$',buy,name='buy'),
+#    url(r'^leader_board/$',leader,name='leader'),    
 
 )
 from settings import MEDIA_URL, MEDIA_ROOT, DEBUG
@@ -43,3 +44,6 @@ if settings.DEBUG:
         (r'media/(?P<path>.*)',
         'serve',
         {'document_root': settings.MEDIA_ROOT}), )
+
+
+

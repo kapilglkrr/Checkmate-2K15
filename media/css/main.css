@@ -93,7 +93,7 @@ body,html {height: 100%;background-color: #f1f1f1; }
 	color:white;
 	line-height: 50px;
 	font-weight: 900;
-	font-size: 60px;
+	font-size: 40px;
 	text-align: center;
 }
 .topContainer2 {
@@ -139,6 +139,7 @@ body,html {height: 100%;background-color: #f1f1f1; }
 .shop {
 	top: 200px;
 	height: 450px;
+	overflow-y: auto;
 }
 
 #shopData {

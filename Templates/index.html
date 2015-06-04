@@ -93,6 +93,11 @@
 	width: 600px;
 	height: 350px;
 	background-color: #aaa;
+	overflow: auto;
+	padding: 15px;
+	font-size: 18px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
 }
 #submit_ans{
 	position: absolute;
@@ -210,7 +215,25 @@ table, tr, td{
 	right: 50px;
 	border: 1px solid #aaa;
 }
-
+.topContainer3{
+	font-weight: 900;
+	height: 60px;
+	line-height: 60px;
+	text-align: center;
+	color: white;
+	font-size: 30px;
+	vertical-align: central;
+	padding: 0px 5px;
+	float: right;
+	width: 175px;
+	background-color: #444;
+	border-left: 25px solid #555;
+	border-right: 10px solid #555;
+}
+.topContainer a{
+	text-decoration: none;
+	color: white;
+}
 </style>
 <!-- end ################################################################################ -->
 </head>
@@ -228,6 +251,9 @@ table, tr, td{
 		<div id="topContainer2" class="topContainer2">
 			<div id="userName" class="userName" ><span class="ln">Team : </span><br><span class="fn">{{u.username}}</span><br></div>
 		</div>
+<a href="/logout/">		<div class="topContainer3">Logout</div></a>
+<!-- <a target="blank" href="/leader_board/">		<div class="topContainer3">Leader Board</div></a>
+ --><a target="blank" href="/media/checkmate_rulebook.pdf">		<div class="topContainer3">Rulebook</div></a>
 	</div>
 
 	<!-- market -->
@@ -293,11 +319,11 @@ matrix=[
 	[51,52,53,54,55]
 ];//naming system used for individual box
 matrix_data=[
-	['F','A','T','S','D'],
-	['U','A','I','V','O'],
-	['C','T','K','P','O'],
-	['Z','N','E','E','G'],
-	['R','J','W','L','N']
+	['S','Y','A','X','A'],
+	['I','N','T','E','L'],
+	['T','E','E','D','O'],
+	['O','N','R','L','C'],
+	['B','S','S','A','N']
 ];
 {
 	var str,ele;
@@ -332,6 +358,8 @@ function setMatrix() {
 			//changing property of the unlocked question
 			if(unlock[i][j]==5)
 			{
+				ele.parents('.alphabet_cont').removeClass('waf_css');
+				ele.parents('.alphabet_cont').removeClass('was_css');
 				ele.parents('.alphabet_cont').addClass('unlocked_css');
 			}
 			else if(unlock[i][j]==1)
@@ -340,6 +368,7 @@ function setMatrix() {
 			}
 			else if(unlock[i][j]==2)
 			{
+				ele.parents('.alphabet_cont').removeClass('waf_css');
 				ele.parents('.alphabet_cont').addClass('was_css');
 			}
 		}
@@ -391,6 +420,12 @@ function claim_word(){
 //start of functions of market#################################
 function buy_this(){
 	ele=$('[name=buy_this');
+
+	if(parseInt(ele.val())<1 || parseInt(ele.val())>25)
+	{
+		alert('Please Enter a Number Between 1 and 25');
+		return;
+	}
 	var place = parseInt(ele.val()) - 1;
 	var i = parseInt(place/5);
 	var j = parseInt(place%5);
@@ -402,7 +437,11 @@ function buy_this(){
 			success : function(data) {
 				if(data.status == 1) {
 					updateScore(data.score);
-					change_css_unlock(parseInt((data.place-1)/5),parseInt((data.place-1)%5));
+					//
+					var i=parseInt((data.place-1)/5)
+					var j=parseInt((data.place-1)%5)
+					unlock[i][j] = 5;
+					change_css_unlock(i,j);
 				}
 				else {
 					alert("You could not buy this Letter !");
@@ -427,22 +466,14 @@ function unlock_let(){
 	}
 }
 
-//remove this function after developing**************************************
-function unlockall()
-{
-	for(var i=0;i<5;i++)
-	{
-		for(var j=0;j<5;j++)
-		{
-			change_css_unlock(i,j);
-		}
-	}
-}
+
 //***************************************
 function change_css_unlock(i,j)
 {
-	unlock[i][j]++;
+//	console.log(unlock[i][j]+"M");
 	ele = $('.alphabet[data-place=\"' + matrix[i][j] + '\"]');
+	ele.parents('.alphabet_cont').removeClass('waf_css');
+	ele.parents('.alphabet_cont').removeClass('was_css');
 	ele.parents('.alphabet_cont').addClass('unlocked_css');
 }
 //end of unlock functions########################################
@@ -462,6 +493,7 @@ $("#submit_ans div").click(function(){
 					 	init();
 					}
 					else {
+						
 						alert("Incorrect Answer ! Please try again..");
 						init();
 					}

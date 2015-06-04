@@ -1,7 +1,7 @@
 <html lang="en" class="no-js"> <!--<![endif]-->
     <head>
         <meta charset="UTF-8" />
-        <title>CHECKMATE 2k14</title>
+        <title>CHECKMATE 2k15</title>
        <!--  <link rel="shortcut icon" href="../favicon.ico">  -->
         <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/demo.css" />
         <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/bootstrap/css/bootstrap.css" />
@@ -12,14 +12,6 @@
   	<script type="text/javascript" src="{{MEDIA_URL}}js/jquery.min.js"></script>
     </head>
     <body>
-    	<div class="videoacm">
-    		<video width="400px" height="380px" autoplay >
-  				<source src="{{MEDIA_URL}}/ACM.mp4" type="video/mp4">
-  				
-  				
-			</video>
-
-    	</div>
     	
         <div class="container">
             <header>
@@ -27,7 +19,7 @@
                <br />
                <div class="row">
                    <div class="col-md-2"><img src="{{MEDIA_URL}}img/logo.png" width="50%" height=""></div>
-                   <div class="col-md-9"><img src="{{MEDIA_URL}}img/cm.png" width="100%"></div>
+                   <div class="col-md-9"><img class ="responsive" src="{{MEDIA_URL}}img/cm.png" width="100%"></div>
                    <!-- <div class="col-md-3"><img src="images/gdg.png" width="100%"></div> -->
                </div> 
                <br />
@@ -40,10 +32,11 @@
                     <div id="wrapper">
                         <div id="login" class="animate form">
                             <!-- <form  action="php/login.php" autocomplete="on" method="get">  -->
+
                             <form autocomplete="on" method="POST" action="">
+                                {% csrf_token %}                           
                                 <h1>Log in</h1> 
                                 <p> 
-                                {% csrf_token %}
                                     <label for="username" class="uname" data-icon="u" > Your username <b>&nbsp;&nbsp;</b></label>
                                     <input id="username" name="username" required="required" type="text" placeholder="myusername"/>
                                 </p>
@@ -63,11 +56,10 @@
 									<a href="/register/" class="to_register reg">Register Here</a>
 								</p>
 								<div class="gbm" id="buttons">
-    		<p>WANNA JOIN US?</p>
-    		<button class="gbmbtn"  onclick="gbm()"  >GBM Membership</button>
+    		<!-- <p>WANNA JOIN US?</p> -->
+    		<button class="gbmbtn"  onclick="gbm()" style="display:none;" >GBM Membership</button>
     		 <script type="text/javascript">
     		function gbm() {
-    			var win=window.open('/media/gbm.pdf', '_blank');
     			 var ck=window.open('/media/ck.jpg','_blank'); 	
     			 ck.focus();			
     		}

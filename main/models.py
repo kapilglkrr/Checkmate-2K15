@@ -21,6 +21,7 @@ class UserProfile(models.Model):
 	waf=models.ManyToManyField('Cordinates',related_name='waf') #storing list of wrong attempted coordinates on first attempt
 	was=models.ManyToManyField('Cordinates',related_name='was') #storing list of wrong attempted coordinates on second attempt
 	words=models.ManyToManyField('Words',related_name='words') #storing list of words made
+	buy=models.IntegerField(default=1)
 	def __unicode__(self):
 		return self.user.username
 

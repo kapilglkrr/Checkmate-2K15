@@ -15,7 +15,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 import json
 @csrf_exempt
-#@csrf_protect
 @login_required
 def question(request):
 	if request.POST:
@@ -44,9 +43,10 @@ def question(request):
 	if request.POST and 'answer' in request.POST:
 		data=request.POST
 		c=Cordinates.objects.get(value=q.no)
-		if data['answer']==q.answer:
+		if data['answer'].lower()==q.answer:
 			up.qu.add(c)
-#			a2=up.waf.remove(c)
+			if up.waf.filter(pk=c.id).exists():
+				up.waf.remove(c)
 			up.save()
 			resp={}
 			resp['status']=1
@@ -54,12 +54,14 @@ def question(request):
 			resp['qno']=q.no	
 			json = simplejson.dumps(resp)
 			return HttpResponse(json, mimetype='application/json')
-		elif data['answer'] is not q.answer :
-		 	if not up.waf.filter(cordinates_id=c.id).exists():
+		elif data['answer'].lower() is not q.answer :
+		 	if not up.waf.filter(pk=c.id).exists():
 		 		up.waf.add(c)
-		 	if up.waf.filter(cordinates_id=c.id).exists():
+		 		up.score -=2
+		 	elif up.waf.filter(pk=c.id).exists():
+		 		up.waf.remove(c)
 		 		up.was.add(c)
-			up.score-=2
+				up.score-=6
 			up.save()
 			resp={}
 			resp['status']=0
@@ -68,8 +70,6 @@ def question(request):
 			json = simplejson.dumps(resp)
 			return HttpResponse(json, mimetype='application/json')
 
-	# elif request.POST:
-	# 	raise Http404
 	else :
 		resp={}
 		resp['status']=1
@@ -84,16 +84,39 @@ def claimword(request):
 	resp={}
 	if request.POST:
 		word=request.POST
-		w=Words.objects.get(word=word['word'])
+		try:
+			w=Words.objects.get(word=word['word'])
+		except ObjectDoesNotExist:
+			w=''
 		if w:
-			up.words.add(w)
-			up.score +=w.points
-			up.save()
-			resp['status']=1
-			resp['score']=up.score
-			resp['word']=word['word']
-			json = simplejson.dumps(resp)
-			return HttpResponse(json, mimetype='application/json')
+			if up.words.filter(word=w.word).exists():
+				resp['status']=2
+				resp['score']=up.score
+				resp['word']=word['word']
+				json = simplejson.dumps(resp)
+				return HttpResponse(json, mimetype='application/json')
+			else:
+				up.words.add(w)
+				if(w.points==3):
+					up.score +=15
+				elif(w.points==4):
+					up.score +=25
+				elif(w.points==5):
+					up.score +=40
+				elif(w.points==12):
+					up.score +=60
+				elif(w.points==14):
+					up.score +=90
+				elif(w.points==16):
+					up.score +=120
+				elif(w.points==27):
+					up.score +=180
+				up.save()
+				resp['status']=1
+				resp['score']=up.score
+				resp['word']=word['word']
+				json = simplejson.dumps(resp)
+				return HttpResponse(json, mimetype='application/json')
 		
 		else:
 			resp['status']=0
@@ -113,8 +136,14 @@ def buy(request):
 	if request.POST:
 		co=request.POST
 		c=Cordinates.objects.get(id=co['cords'])
+		if up.waf.filter(pk=c.id).exists():
+			up.waf.remove(c)
+		if up.was.filter(pk=c.id).exists():
+			up.was.remove(c)
 		up.qu.add(c)
-		up.score -= 2
+		up.buy+=1
+		up.score -= 2**(up.buy)
+		up.save()
 		resp['status']=1
 		resp['place']=co['cords']
 		resp['score']=up.score
@@ -171,16 +200,14 @@ def login(request):
 	else:
 		form=LoginForm()
 		return render_to_response('LOGINhtml.html', {'form':form},context_instance=RequestContext(request))
-@csrf_protect
+@csrf_exempt
 def register(request):
 	m=''
 	if request.user.is_authenticated():
 		return HttpResponseRedirect('/main/')
 	if request.POST:
-
 		form=RegistrationForm(request.POST)
 		if form.is_valid():
-			
 			data=form.cleaned_data
 			u=User()
 			up=UserProfile()
@@ -203,11 +230,12 @@ def register(request):
 			up.save()
 			return HttpResponseRedirect('/login/')
 		else:
+			m='Try filling all the details of atleast 1 member'
 			return render_to_response('REGIShtml.html',{'message':m},context_instance=RequestContext(request))
 	else:
 		form=RegistrationForm()
 		return render_to_response('REGIShtml.html',{'form':form},context_instance=RequestContext(request))
-
+@csrf_exempt
 @login_required
 def logout(request):
     auth.logout(request)
@@ -215,3 +243,17 @@ def logout(request):
 
 def rulebook(request):
 	 return render_to_response('rulebook.html',context_instance=RequestContext(request))
+
+# def leader(request):
+# 	resp = {}
+# 	up=UserProfile.objects.all().order_by('-score')
+# 	u=User.objects.all()
+# 	# for i in up:
+# 	# 	u=User.objects.get(pk=i.user_id)
+# 	# 	resp[u.username]=i.score
+# 	# # return HttpResponse(l)
+# 	#print resp
+# #	sort(resp)
+# #	resp=sorted(resp.iteritems())
+
+# 	return render_to_response('leader.html',{'resp':up,'u':u},context_instance=RequestContext(request))

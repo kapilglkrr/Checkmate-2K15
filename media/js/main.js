@@ -47,7 +47,7 @@ function updateScore(current) {
                 else
                     $scoreBox.css("color", "white");
             }
-        }, 80);
+        }, 10);
     }
     else if (onBoard < current) {
         console.log("green path");
@@ -66,7 +66,7 @@ function updateScore(current) {
                 else
                     $scoreBox.css("color", "white");
             }
-        }, 80);
+        }, 10);
     }
 
 }
@@ -193,8 +193,6 @@ function init() {
 				var id = tmp[i].pk - 1;
 				var row = parseInt(id/5);
 				var col = id%5;
-				console.log(row);
-				console.log(col);
 				unlock[row][col] = 1;
 			}
 

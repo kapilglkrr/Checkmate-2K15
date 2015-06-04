@@ -43,7 +43,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main'
+    'main',
+    'south'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -65,7 +66,7 @@ WSGI_APPLICATION = 'ck.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ck15',
+        'NAME': 'ck2015',
         'USER': 'root',                      # Not used with sqlite3.
         'PASSWORD': 'radheradhe',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -90,10 +91,10 @@ LOGIN_URL='/login/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT =  os.path.join(BASE_DIR, 'Static')
+STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-STATIC_URL = '/static/'
+
 MEDIA_URL = '/media/'
